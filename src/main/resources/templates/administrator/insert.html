@@ -68,7 +68,7 @@
 							<div class="form-group">
 								<div class="row">
 									<div class="col-sm-12">
-										<label for="passwaord">
+										<label for="password">
 											パスワード:
 										</label>
 										<label th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-messages">
@@ -76,6 +76,21 @@
 										</label>
 										<input type="password" name="password" id="password" class="form-control" placeholder="password"
 											 th:field="*{password}" th:errorclass="error-input" value="xxxxxxxx">
+									</div>
+								</div>
+							</div>
+							<!-- 確認用パスワード -->
+							<div class="form-group">
+								<div class="row">
+									<div class="col-sm-12">
+										<label for="confirmPassword">
+											確認用パスワード:
+										</label>
+										<label th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="error-messages">
+											もう一度パスワードを入力してください
+										</label>
+										<input type="password" name="confirmPassword" id="confirmPassword" class="form-control" placeholder="もう一度入力してください"
+											 th:field="*{confirmPassword}" th:errorclass="error-input" value="xxxxxxxx">
 									</div>
 								</div>
 							</div>
