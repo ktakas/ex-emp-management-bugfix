@@ -20,6 +20,9 @@ public class AdministratorService {
 	
 	@Autowired
 	private AdministratorRepository administratorRepository;
+	
+	@Autowired
+	private BCryptPasswordEncoder encoder;
 
 	/**
 	 * 管理者情報を登録します.
@@ -27,7 +30,6 @@ public class AdministratorService {
 	 * @param administrator　管理者情報
 	 */
 	public void insert(Administrator administrator) {
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		String hashedPassword = encoder.encode(administrator.getPassword());
 		administrator.setPassword(hashedPassword);
 		administratorRepository.insert(administrator);
@@ -41,7 +43,6 @@ public class AdministratorService {
 	 */
 	public Administrator login(String mailAddress, String password) {
 		Administrator admin = findByMailAddress(mailAddress);	
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		if (encoder.matches(password, admin.getPassword())) {
 			return admin;
 		}
