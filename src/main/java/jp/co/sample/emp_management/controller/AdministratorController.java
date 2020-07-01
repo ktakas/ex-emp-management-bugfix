@@ -77,11 +77,19 @@ public class AdministratorController {
 			RedirectAttributes redirectAttributes,
 			Model model
 	) {
+		// パスワードが一致しない
 		if (!form.getPassword().equals(form.getConfirmPassword())) {
 			FieldError fieldError = new FieldError("insertedAdministratorForm", "confirmPassword", "パスワードが一致していません");
 			result.addError(fieldError);
 		}
 		
+		// メールアドレスが重複
+		if (administratorService.findByMailAddress(form.getMailAddress()) != null) {
+			FieldError fieldError = new FieldError("insertedAdministratorForm", "mailAddress", "メールアドレスが重複しています");
+			result.addError(fieldError);
+		}
+		
+		// 入力フォームにエラーがある
 		if (result.hasErrors()) {
 			return toInsert(model);
 		}
