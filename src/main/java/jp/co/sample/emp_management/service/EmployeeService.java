@@ -52,4 +52,8 @@ public class EmployeeService {
 	public void update(Employee employee) {
 		employeeRepository.update(employee);
 	}
+	
+	public List<Employee> searchByName(String employeeName) {
+		return employeeRepository.searchByName(employeeName);
+	}
 }
