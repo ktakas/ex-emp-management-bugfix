@@ -45,6 +45,16 @@ public class EmployeeService {
 	}
 	
 	/**
+	 * メールアドレスから従業員情報を検索します.
+	 * 
+	 * @param mailAddress メールアドレス
+	 * @return 従業員情報(いなければnull)
+	 */
+	public Employee searchByMailAddress(String mailAddress) {
+		return employeeRepository.searchByMailAddress(mailAddress);
+	}
+	
+	/**
 	 * 従業員情報を更新します.
 	 * 
 	 * @param employee　更新した従業員情報
@@ -53,7 +63,22 @@ public class EmployeeService {
 		employeeRepository.update(employee);
 	}
 	
+	/**
+	 * 名前から従業員をあいまい検索します.
+	 * 
+	 * @param employeeName 従業員名
+	 * @return 一致する従業員のリスト
+	 */
 	public List<Employee> searchByName(String employeeName) {
 		return employeeRepository.searchByName(employeeName);
+	}
+
+	/**
+	 * 従業員をインサートします.
+	 * 
+	 * @param employee インサートする従業員
+	 */
+	public void insert(Employee employee) {
+		employeeRepository.insert(employee);
 	}
 }

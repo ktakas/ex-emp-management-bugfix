@@ -13,7 +13,7 @@ public class Employee {
 	private Integer id;
 	/** 従業員名 */
 	private String name;
-	/** 画像 */
+	/** 画像(base64形式) */
 	private String image;
 	/** 性別 */
 	private String gender;

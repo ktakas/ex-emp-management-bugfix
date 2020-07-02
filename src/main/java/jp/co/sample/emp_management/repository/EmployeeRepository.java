@@ -3,6 +3,7 @@ package jp.co.sample.emp_management.repository;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -40,6 +41,13 @@ public class EmployeeRepository {
 		employee.setDependentsCount(rs.getInt("dependents_count"));
 		return employee;
 	};
+	
+	/**
+	 * IDの最大値を取得するためのマッパー.
+	 */
+	private static final RowMapper<Integer> GET_MAX_ID_ROW_MAPPER = (rs, i) -> {
+		return rs.getInt("max");
+	};
 
 	@Autowired
 	private NamedParameterJdbcTemplate template;
@@ -73,6 +81,24 @@ public class EmployeeRepository {
 
 		return development;
 	}
+	
+	/**
+	 * メールアドレスから従業員を検索します.
+	 * 
+	 * @param mailAddress メールアドレス
+	 * @return 従業員情報(いなければnull)
+	 */
+	public Employee searchByMailAddress(String mailAddress) {
+		String searchSql = "SELECT id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count FROM employees WHERE mail_address=:mailAddress";
+		SqlParameterSource param = new MapSqlParameterSource().addValue("mailAddress", mailAddress);
+		try {
+			Employee employee = template.queryForObject(searchSql, param, EMPLOYEE_ROW_MAPPER);
+			return employee;
+		} catch (DataAccessException e) {
+			// 合致する従業員がいない場合
+			return null;
+		}
+	}
 
 	/**
 	 * 従業員情報を変更します.
@@ -94,5 +120,22 @@ public class EmployeeRepository {
 		String searchSql = "SELECT id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count FROM employees WHERE name LIKE :employeeName ORDER BY hire_date DESC;";
 		SqlParameterSource param = new MapSqlParameterSource().addValue("employeeName", "%" + employeeName + "%");
 		return template.query(searchSql, param, EMPLOYEE_ROW_MAPPER);
+	}
+
+	/**
+	 * 従業員情報を保存します.
+	 * 
+	 * @param employee 従業員情報
+	 */
+	synchronized public void insert(Employee employee) {
+		// 現在の従業員IDの最大値+1を従業員にセットする
+		String getMaxIdSql = "SELECT max(id) FROM employees;";
+		Integer maxId = template.query(getMaxIdSql, GET_MAX_ID_ROW_MAPPER).get(0);
+		System.out.println(maxId);
+		employee.setId(maxId == null ? 0 : ++maxId);
+		
+		String insertSql = "INSERT INTO employees(id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count) VALUES (:id,:name,:image,:gender,:hireDate,:mailAddress,:zipCode,:address,:telephone,:salary,:characteristics,:dependentsCount);";
+		SqlParameterSource param = new BeanPropertySqlParameterSource(employee);
+		template.update(insertSql, param);
 	}
 }

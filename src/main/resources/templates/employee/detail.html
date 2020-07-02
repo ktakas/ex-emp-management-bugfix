@@ -85,7 +85,7 @@
 							      写真
 							    </th>
 							    <td>
-							      <img src="../../static/img/e2.png" th:src="${'/img/' + employee.image}" />
+							      <img src="../../static/img/e2.png" th:src="${'data:image/png;base64,' + employee.image}" width="20%"/>
 							    </td>
 							  </tr>
 							  <tr>
@@ -162,8 +162,9 @@
 									</label>
 									<label class="control-label" style="color: red" for="dependentsCount"></label>
 									<input type="hidden" name="id" th:value="${employee.id}">
-									<input type="text" name="dependentsCount" id="dependentsCount" class="form-control" value="3"
-										 th:errorclass="error-input"th:field="*{dependentsCount}" th:value="${employee.dependentsCount}">
+									<input type="number" name="dependentsCount" id="dependentsCount" class="form-control" value=3
+										 th:errorclass="error-input" th:value="${employee.dependentsCount}">
+										 <!--  th:field="*{dependentsCount}"があるとth:valueが効かない -->
 							    </td>
 							  </tr>
 							</table>
