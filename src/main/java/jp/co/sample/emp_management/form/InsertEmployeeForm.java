@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
  *
  */
 public class InsertEmployeeForm {
-	// TODO: バリデーションの追加
 	/** 従業員名 */
 	@NotBlank(message = "名前を入力してください")
 	private String name;

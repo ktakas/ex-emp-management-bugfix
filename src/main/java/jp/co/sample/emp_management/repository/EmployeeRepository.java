@@ -145,4 +145,15 @@ public class EmployeeRepository {
 		SqlParameterSource param = new BeanPropertySqlParameterSource(employee);
 		template.update(insertSql, param);
 	}
+	
+	/**
+	 * 従業員名の一覧を返却します.
+	 * 
+	 * @return 従業員名一覧のリスト
+	 */
+	public List<String> loadAllEmployeeName() {
+		String sql = "SELECT name FROM employees;";
+		List<String> nameList = template.query(sql, EMPLOYEE_NAME_ROW_MAPPER);
+		return nameList;
+	}
 }

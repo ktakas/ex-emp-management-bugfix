@@ -81,4 +81,11 @@ public class EmployeeService {
 	public void insert(Employee employee) {
 		employeeRepository.insert(employee);
 	}
+	
+	/**
+	 * 従業員名の一覧を取得します.
+	 */
+	public List<String> loadAllEmployeeName() {
+		return employeeRepository.loadAllEmployeeName();
+	}
 }

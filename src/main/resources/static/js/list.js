@@ -9,10 +9,7 @@ $(() => {
 			async: true
 		}).done(data => {
 			$("#searchbar").autocomplete({
-				source: data.nameList,
-				_renderMenu: (ul, items) => {
-					$(ul).css("color", "red");
-				}
+				source: data.empNameList
 			});
 		}).fail((XMLHttpRequest, textStatus, errorThrown) => {
 			alert("エラーが発生しました");

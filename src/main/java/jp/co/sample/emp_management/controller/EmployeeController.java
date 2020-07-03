@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +43,9 @@ public class EmployeeController {
 
 	@Autowired
 	private EmployeeService employeeService;
-	
-	// showListの度に更新される全従業員の名前
-	private List<String> currentEmployeeNameList;
+
+	@Autowired
+	private HttpSession session;
 
 	/**
 	 * 使用するフォームオブジェクトをリクエストスコープに格納する.
@@ -88,15 +90,8 @@ public class EmployeeController {
 	 */
 	@RequestMapping("/showList")
 	public String showList(Model model) {
-		System.out.println(model);
-
 		List<Employee> employeeList = employeeService.showList();
-		List<String> employeeNameList = new ArrayList<>();
-		for(Employee employee: employeeList) {
-			employeeNameList.add(employee.getName());
-		}
 		model.addAttribute(employeeList);
-		currentEmployeeNameList = employeeNameList;
 		return "employee/list";
 	}
 
@@ -148,11 +143,21 @@ public class EmployeeController {
 		return "employee/insert";
 	}
 	
+	/**
+	 * 従業員名の一覧をマップで返却するAPIです.
+	 * 
+	 * @return 従業員名の一覧
+	 */
 	@ResponseBody
 	@RequestMapping(value = "name", method = RequestMethod.GET)
 	public Map<String, List<String>> getAllEmployeeNameList() {
 		Map<String, List<String>> map = new HashMap<>();
-		map.put("nameList", currentEmployeeNameList);
+		List<String> empNameList = (List<String>) session.getAttribute("empNameList");
+		if (empNameList == null) {
+			empNameList = employeeService.loadAllEmployeeName();
+			session.setAttribute("empNameList", empNameList); 
+		}
+		map.put("empNameList", empNameList);
 		return map;
 	}
 
@@ -203,11 +208,8 @@ public class EmployeeController {
 			byte[] encodedImage = Base64.getEncoder().encode(byteImage);
 			StringBuilder imageURI = new StringBuilder();
 			imageURI.append(StringUtils.newStringUtf8(encodedImage));
-			System.out.println("エンコード前: " + byteImage);
-			System.out.println("エンコード後: " + imageURI);
 			employee.setImage(imageURI.toString());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
