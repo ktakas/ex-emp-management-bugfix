@@ -1,5 +1,6 @@
 package jp.co.sample.emp_management.repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import jp.co.sample.emp_management.domain.Employee;
+import jp.co.sample.emp_management.domain.EmployeeListAndCount;
+import jp.co.sample.emp_management.domain.EmployeeResultSetExtractor;
 
 /**
  * employeesテーブルを操作するリポジトリ.
@@ -70,6 +73,20 @@ public class EmployeeRepository {
 		List<Employee> developmentList = template.query(sql, EMPLOYEE_ROW_MAPPER);
 
 		return developmentList;
+	}
+	
+	/**
+	 * リミットとオフセットを指定して従業員情報を取得します.
+	 * 
+	 * @param offset オフセット
+	 * @param limit　リミット
+	 * @return 従業員情報の一覧と全データ件数の入ったオブジェクト
+	 */
+	public EmployeeListAndCount findEmployeesByOffsetAndLimit(int offset, int limit) {
+		String sql = "SELECT id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count, COUNT(id) over() AS data_count FROM employees ORDER BY hire_date DESC LIMIT :limit OFFSET :offset;";
+		SqlParameterSource paramMap = new MapSqlParameterSource().addValue("offset", offset).addValue("limit", limit);
+		EmployeeResultSetExtractor employeeResultSetExtractor = new EmployeeResultSetExtractor();
+		return template.query(sql, paramMap, employeeResultSetExtractor);
 	}
 
 	/**

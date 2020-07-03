@@ -67,6 +67,9 @@
 				<div class="pull-left">
 					<label class="label label-success" th:if="${isInsertedOk}">従業員を追加しました</label>
 				</div>
+				<div class="pull-left">
+					<p><span th:text="${session.dataCount}"></span>件中<span th:text="${session.offset}"></span>件から<span th:text="${session.limit}"></span>件目を表示しています</p>
+				</div>
 				<div class="pull-right">
 					<form th:action="@{/employee/search}" th:object="${searchForm}" method="POST">
 						<label th:if="${empNotFound}" class="alert-danger">1件もありませんでした</label><br>
@@ -98,7 +101,13 @@
 						</tr>
 					</tbody>
 				</table>
-
+				<form class="pull-left" th:action="@{/employee/toPrevPage}">
+					<button th:if="${session.offset != 1}" class="btn-sm btn-info">前へ</button>
+				</form>
+				
+				<form class="pull-right" th:action="@{/employee/toNextPage}">
+					<button th:if="${session.limit != session.dataCount}" class="btn-sm btn-info">次へ</button>
+				</form>
 
 <!-- ここから下を編集する必要はありません -->
 

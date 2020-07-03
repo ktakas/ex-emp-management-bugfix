@@ -3,7 +3,6 @@ package jp.co.sample.emp_management.controller;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.co.sample.emp_management.domain.Employee;
+import jp.co.sample.emp_management.domain.EmployeeListAndCount;
 import jp.co.sample.emp_management.form.InsertEmployeeForm;
 import jp.co.sample.emp_management.form.SearchForm;
 import jp.co.sample.emp_management.form.UpdateEmployeeForm;
@@ -46,6 +46,8 @@ public class EmployeeController {
 
 	@Autowired
 	private HttpSession session;
+
+	private static final int PAGINATION_LIMIT = 10;
 
 	/**
 	 * 使用するフォームオブジェクトをリクエストスコープに格納する.
@@ -88,11 +90,63 @@ public class EmployeeController {
 	 * @param model モデル
 	 * @return 従業員一覧画面
 	 */
-	@RequestMapping("/showList")
+//	@RequestMapping("/showList")
 	public String showList(Model model) {
 		List<Employee> employeeList = employeeService.showList();
 		model.addAttribute(employeeList);
 		return "employee/list";
+	}
+
+	/**
+	 * セッションのoffsetとlimitから取得件数を指定して従業員一覧画面を出力します.
+	 * 
+	 * @param model モデル
+	 * @return 従業員一覧画面
+	 */
+	@RequestMapping("/showList")
+	public String showLimitedList(Model model) {
+		Integer currentOffset = (Integer) session.getAttribute("offset");
+		if (currentOffset == null) {
+			currentOffset = 1;
+			session.setAttribute("offset", currentOffset);
+		}
+
+		EmployeeListAndCount employeeListAndCount = employeeService.showLimitedList(currentOffset, PAGINATION_LIMIT);
+		List<Employee> employeeList = employeeListAndCount.getEmployeeList();
+		Integer dataCount = employeeListAndCount.getDataCount();
+
+		// ページの上限番号を計算 全データ件数より大きければ
+		session.setAttribute("limit", currentOffset-- + PAGINATION_LIMIT > dataCount ? dataCount : currentOffset + PAGINATION_LIMIT);
+		
+		session.setAttribute("dataCount", dataCount);
+		model.addAttribute(employeeList);
+		return "employee/list";
+	}
+
+	/**
+	 * 現在のデータのオフセットを進めます.
+	 * 
+	 * @return 従業員一覧にリダイレクト
+	 */
+	@RequestMapping("/toNextPage")
+	public String toNextPage() {
+		Integer nextOffset = (Integer) session.getAttribute("offset") + PAGINATION_LIMIT;
+		Integer dataCount = (Integer) session.getAttribute("dataCount");
+
+		session.setAttribute("offset", nextOffset > dataCount ? nextOffset - 10 : nextOffset);
+		return "redirect:/employee/showList";
+	}
+
+	/**
+	 * 現在のデータのオフセットを戻します.
+	 * 
+	 * @return 従業員一覧にリダイレクト
+	 */
+	@RequestMapping("/toPrevPage")
+	public String toPrevPage() {
+		Integer prevOffset = (Integer) session.getAttribute("offset") - PAGINATION_LIMIT;
+		session.setAttribute("offset", prevOffset < 1 ? 1 : prevOffset);
+		return "redirect:/employee/showList";
 	}
 
 	/////////////////////////////////////////////////////
@@ -142,7 +196,7 @@ public class EmployeeController {
 	public String toInsert(Model model) {
 		return "employee/insert";
 	}
-	
+
 	/**
 	 * 従業員名の一覧をマップで返却するAPIです.
 	 * 
@@ -155,7 +209,7 @@ public class EmployeeController {
 		List<String> empNameList = (List<String>) session.getAttribute("empNameList");
 		if (empNameList == null) {
 			empNameList = employeeService.loadAllEmployeeName();
-			session.setAttribute("empNameList", empNameList); 
+			session.setAttribute("empNameList", empNameList);
 		}
 		map.put("empNameList", empNameList);
 		return map;

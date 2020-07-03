@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jp.co.sample.emp_management.domain.Employee;
+import jp.co.sample.emp_management.domain.EmployeeListAndCount;
 import jp.co.sample.emp_management.repository.EmployeeRepository;
 
 /**
@@ -30,6 +31,17 @@ public class EmployeeService {
 	public List<Employee> showList() {
 		List<Employee> employeeList = employeeRepository.findAll();
 		return employeeList;
+	}
+	
+	/**
+	 * 従業員情報をオフセットとリミットを指定して取得します.
+	 * 
+	 * @return　従業員情報一覧(
+	 */
+	public EmployeeListAndCount showLimitedList(int offset, int limit) {
+		// 1件目は0番目のデータなのでここで差異を吸収
+		EmployeeListAndCount employeeListAndCount = employeeRepository.findEmployeesByOffsetAndLimit(--offset, limit);
+		return employeeListAndCount;
 	}
 	
 	/**
