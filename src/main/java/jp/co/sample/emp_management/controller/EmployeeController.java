@@ -3,8 +3,11 @@ package jp.co.sample.emp_management.controller;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -16,6 +19,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.co.sample.emp_management.domain.Employee;
@@ -36,6 +41,9 @@ public class EmployeeController {
 
 	@Autowired
 	private EmployeeService employeeService;
+	
+	// showListの度に更新される全従業員の名前
+	private List<String> currentEmployeeNameList;
 
 	/**
 	 * 使用するフォームオブジェクトをリクエストスコープに格納する.
@@ -83,7 +91,12 @@ public class EmployeeController {
 		System.out.println(model);
 
 		List<Employee> employeeList = employeeService.showList();
-		model.addAttribute("employeeList", employeeList);
+		List<String> employeeNameList = new ArrayList<>();
+		for(Employee employee: employeeList) {
+			employeeNameList.add(employee.getName());
+		}
+		model.addAttribute(employeeList);
+		currentEmployeeNameList = employeeNameList;
 		return "employee/list";
 	}
 
@@ -133,6 +146,14 @@ public class EmployeeController {
 	@RequestMapping("/toInsert")
 	public String toInsert(Model model) {
 		return "employee/insert";
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "name", method = RequestMethod.GET)
+	public Map<String, List<String>> getAllEmployeeNameList() {
+		Map<String, List<String>> map = new HashMap<>();
+		map.put("nameList", currentEmployeeNameList);
+		return map;
 	}
 
 	/**

@@ -9,3 +9,20 @@
 .error-messages {
 	color: #ff0000;
 }
+
+.ui-autocomplete {
+    background: #FFEEEE;
+    width: 10em;
+}
+
+.ui-autocomplete .ui-menu-item .ui-corner-all {
+   
+}
+
+.ui-autocomplete .ui-menu-item .ui-state-focus {
+   background: #FFEEFF;
+}
+
+.ui-helper-hidden-accessible {
+	display:none;
+}

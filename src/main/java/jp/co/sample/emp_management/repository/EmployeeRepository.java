@@ -43,6 +43,13 @@ public class EmployeeRepository {
 	};
 	
 	/**
+	 * ResultSetオブジェクトから名前のみを取得するローマッパー.
+	 */
+	private static final RowMapper<String> EMPLOYEE_NAME_ROW_MAPPER = (rs, i) -> {
+		return rs.getString("name");
+	};
+	
+	/**
 	 * IDの最大値を取得するためのマッパー.
 	 */
 	private static final RowMapper<Integer> GET_MAX_ID_ROW_MAPPER = (rs, i) -> {

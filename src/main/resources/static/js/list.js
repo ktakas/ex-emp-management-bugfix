@@ -1,25 +1,24 @@
-$(() => {
-	// 住所検索
-	$("#search-address").on("click", e => {
-		var zipcode = $("#zipCode").val();
-		var type = "GET";
-		var url = "http://zipcoda.net/api";
+$(() => {	
+	$("#searchbar").one("click", () => {
+  		var url = "/employee/name";
+  		var type = "GET";
 		$.ajax({
 			url,
 			type,
-			dataType: "jsonp",
-			data: {
-				zipcode
-			},
+			dataType: "json",
 			async: true
 		}).done(data => {
-			console.dir(JSON.stringify(data));
-			$("#address").val(data.items[0].components.join(""));
+			$("#searchbar").autocomplete({
+				source: data.nameList,
+				_renderMenu: (ul, items) => {
+					$(ul).css("color", "red");
+				}
+			});
 		}).fail((XMLHttpRequest, textStatus, errorThrown) => {
 			alert("エラーが発生しました");
 			console.error("XMLHttpRequest:", XMLHttpRequest.status);
 			console.error("textStatus	 :", textStatus);
 			console.error("errorThrown   :", errorThrown.message);
-		})
+		});
 	});
 })
